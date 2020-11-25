@@ -6,9 +6,9 @@ module.exports = {
 	initMroute: function (app, seneca) {
 		app.get('/sourcing/company', commonMiddleware, (req, res) => { searchCompany(req, res, seneca) });
 		app.get('/sourcing/companyDetail', commonMiddleware, (req, res) => { companyDetail(req, res, seneca) });
+		app.post('/sourcing/company/update', commonMiddleware, (req, res) => { companyUpdate(req, res, seneca) });
 
 		async function searchCompany(req, res, seneca) {
-			console.log("req.query:", req.query)
 			let companies = [];
 			let count = 0;
 			const keyword = req.query.searchString;
@@ -28,13 +28,12 @@ module.exports = {
 				module: 'sourcing',
 				controller: 'graphql',
 				args: {
-					query: companiesQuery,
+					source: companiesQuery,
 					variables: {
 						keyword, gongYiList, areaKeyList, industryList, factory, employee, annual, certification, researcher, pageIndex, pageSize
 					}
 				}
 			})
-			console.log("result:", result);
 			if (result.data && result.data.companies) {
 				companies = result.data.companies.companies;
 				count = result.data.companies.count;
@@ -45,11 +44,11 @@ module.exports = {
 			let companyDetail;
 			const id = req.query.id;
 			if (id) {
-				let result = Mservice.actSync(seneca, {
+				let result = await Mservice.actAsync(seneca, {
 					module: 'sourcing',
 					controller: 'graphql',
 					args: {
-						query: companyDetailQuery,
+						source: companyDetailQuery,
 						variables: {
 							id
 						}
@@ -58,7 +57,36 @@ module.exports = {
 				if (result.data && result.data.companyDetail)
 					companyDetail = result.data.companyDetail;
 			}
+
 			return res.json({ companyDetail: companyDetail || {} })
+		}
+		async function companyUpdate(req, res, seneca) {
+			let company;
+			const id = req.body.id;
+			if (id) {
+				const keyword = req.body.keyword || "";
+				const gongYiList = req.body.gongYiList || "";
+				const areaKeyList = req.body.areaKeyList || "";
+				const industryList = req.body.industryList || "";
+				const factory = req.body.factory || "";
+				const employee = req.body.employee || "";
+				const annual = req.body.annual || "";
+				const certification = req.body.certification || "";
+				const researcher = req.body.researcher || "";
+				let result = await Mservice.actAsync(seneca, {
+					module: 'sourcing',
+					controller: 'graphql',
+					args: {
+						source: companyUpdateMutation,
+						variables: {
+							id, keyword, gongYiList, areaKeyList, industryList, factory, employee, annual, certification, researcher
+						}
+					}
+				})
+				if (result.data && result.data.updateCompany)
+					company = result.data.updateCompany;
+			}
+			return res.json({ company: company || {} });
 		}
 		async function commonMiddleware(req, res, next) {
 			const lang = (req.query && req.query.lang) || "cn";
@@ -226,9 +254,6 @@ const companiesQuery = `
 	    	employeeNumber
 	    	share
 	    }
-	    companyIndustryCustomer {
-	    	mainMarkets
-	    }
 	    annualOutputValue
 	    maxAnnualOutputValue
 	    importExport {
@@ -238,14 +263,6 @@ const companiesQuery = `
 	    keyFeatures
 	    factoryArea
 	    certifications
-		photos {
-			entity
-			type
-			attachment{
-				fileName
-				url
-			}
-		}
 		}
 		count
 
@@ -434,3 +451,47 @@ const companyDetailQuery = `
 		}
 	}
 `;
+
+const companyUpdateMutation = `
+mutation updateCompany($id: String!, $keyword: String, $gongYiList: String, $areaKeyList: String, $industryList: String, $factory: String, $employee: String, $annual: String, $certification: String, $researcher: String){
+		updateCompany(id:$id, keyword:$keyword, gongYiList:$gongYiList, areaKeyList:$areaKeyList, industryList:$industryList, factory:$factory, employee:$employee, annual:$annual, certification:$certification, researcher:$researcher){
+			_id
+			logoUrl
+			title
+			companyNature
+			introduction
+			area
+			establishedYear
+			creditCode
+			internetSide	
+			shareholders{
+				name
+				share
+			}
+			keyWordClssifacation
+			keyWords
+			employeeNumber
+			RDDesignEmployee{
+				employeeNumber
+				share
+			}
+			techEmployee{
+				employeeNumber
+				share
+			}
+			QIEmployee{
+				employeeNumber
+				share
+			}	
+			annualOutputValue
+			maxAnnualOutputValue
+			importExport{
+				rights
+				share
+			}
+			keyFeatures
+			factoryArea
+			certifications
+		}
+	}
+`
