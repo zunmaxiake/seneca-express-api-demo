@@ -26,9 +26,10 @@ Express 中台
 3. 提交代码
 4. 新建 Pull Request
 
-###apidoc command
-1.windows环境
-apidoc -i .\api\plugin\ -o .\api\apidoc\ -f "js"
-2.linux环境
+### apidoc command
+1. windows环境
+ apidoc -i .\api\plugin\ -o .\api\apidoc\ -f "js"
+2. linux环境
+ apidoc -i api/plugin/ -o api/apidoc/ -f "js"
 
 url localhost:8000/apidoc
