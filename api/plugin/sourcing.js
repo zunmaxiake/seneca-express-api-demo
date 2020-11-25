@@ -8,6 +8,110 @@ module.exports = {
 		app.get('/sourcing/companyDetail', commonMiddleware, (req, res) => { companyDetail(req, res, seneca) });
 		app.post('/sourcing/company/update', commonMiddleware, (req, res) => { companyUpdate(req, res, seneca) });
 
+		/**
+		 * @api {get} /sourcing/company Request Company list information
+		 * @apiName searchCompany
+		 * @apiGroup Company
+		 * @apiVersion 0.1.0
+		 * @apiParam {String} searchString Company's keyword.
+		 * @apiParam {String} gongYiList
+		 * @apiParam {String} areaKeyList
+		 * @apiParam {String} industryList
+		 * @apiParam {String} factoryArea
+		 * @apiParam {String} employeeNumber
+		 * @apiParam {String} annual
+		 * @apiParam {String} certification
+		 * @apiParam {String} researchNumber
+		 * @apiParam {String} pageSize
+		 * @apiParam {String} pageIndex
+		 *
+		 * @apiSuccess {Number} code      code
+		 * @apiSuccess {String} message     提示，当code不是200时提示该错误
+		 * @apiSuccess {Object} data 数据部分
+		 * @apiSuccessExample Success-Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        "code":200,
+   *        "data":{
+							"companies": [
+								{
+									"_id": "5d1c494f252374356417388e",
+									"title": "东莞市新光五金有限公司",
+									"introduction": "东莞市新光五金有限公司创建于1996年，位于广东省东莞市长安镇厦岗南面工业区，是一家专业生产箱包、手袋、制鞋、制衣等行业的各种压铸锌合金饰品配件；以及专业生产工业用华司（垫圈）与组合螺丝用华司（垫圈）、弹垫、挡圈、卡环、E扣、精密电子配件、螺母等各种类型冲压五金配件,另外，我们有四个分厂，涉及模具制造，塑胶零件注塑成型，螺母螺丝加工，数控车床加工件，自动车床加工件,精密进口先进的五轴，四轴，三轴电脑锣加工件。 公司引进台湾先进的专业机器及周边设备，借鉴台湾、香港和大陆数十年之模具制造经验，凭着坚实的研发能力，为客户提供品质优良且价格合理之产品。与客户紧密配合，以满足客户生产需求为己任。",
+									"logoUrl": "",
+									"companyNature": "民营",
+									"area": [
+										"China",
+										"Japan",
+										"Korea"
+									],
+									"establishedYear": "1996",
+									"creditCode": "123456789123456789",
+									"internetSide": " http://www.l-tooling.com",
+									"shareholders": [
+										{
+											"name": "张三",
+											"share": 50
+										},
+										{
+											"name": "李四 ",
+											"share": 25
+										},
+										{
+											"name": "王五",
+											"share": 25
+										}
+									],
+									"keyWordClssifacation": [
+										"engineering",
+										"semiconductor",
+										"electronics"
+									],
+									"employeeNumber": " 500-1000",
+									"RDDesignEmployee": {
+										"employeeNumber": "300",
+										"share": 10
+									},
+									"techEmployee": {
+										"employeeNumber": "300",
+										"share": 10
+									},
+									"QIEmployee": {
+										"employeeNumber": "100",
+										"share": 10
+									},
+									"annualOutputValue": "5000000",
+									"maxAnnualOutputValue": "5000000",
+									"importExport": {
+										"rights": "Y",
+										"share": 10
+									},
+									"keyFeatures": [
+										"smithing",
+										"plating",
+										"bearing"
+									],
+									"factoryArea": "50000",
+									"certifications": [
+										"ISO9001"
+									]
+								}
+							],
+							"pageSize": 10,
+							"pageIndex": 0,
+							"count": 1,
+							"isHome": true
+						},
+   *         "message":"success"
+   *     }
+   * @apiError QueryError
+   * @apiErrorExample {json} 服务器错误:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        code: 500,
+   *        message: '查询错误',
+   *     }
+   */
 		async function searchCompany(req, res, seneca) {
 			let companies = [];
 			let count = 0;
@@ -60,6 +164,113 @@ module.exports = {
 
 			return res.json({ companyDetail: companyDetail || {} })
 		}
+		/**
+		 * @api {post} /sourcing/company/update 修改公司基本信息
+		 * @apiName updateCompany
+		 * @apiGroup Company
+		 * @apiVersion 0.1.0
+		 * @apiParamExample {json} Request-Example:
+		 * {
+					"id" : "5d1c494f252374356417388e",
+					"keyword" : "工程机械,汽车,电子行业,涂装,渡银,测试",
+					"keyFeatures":"smithing,plating,bearing",
+					"areaKeyList" : "China,Japan,Korea",
+					"industryList" : "engineering,semiconductor,electronics",
+					"factory" : "50000",
+					"employee" : " 500-1000",
+					"annual" : "5000000",
+					"certification" : "ISO9001",
+					"researcher" : "300"
+				}
+				@apiSuccess {Number} code      code
+				@apiSuccess {String} message     提示，当code不是200时提示该错误
+				@apiSuccess {Object} data 数据部分
+				@apiSuccessExample Success-Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        "code":200,
+   *        "data":{
+								"company": {
+									"_id": "5d1c494f252374356417388e",
+									"logoUrl": "",
+									"title": "东莞市新光五金有限公司",
+									"companyNature": "民营",
+									"introduction": "东莞市新光五金有限公司创建于1996年，位于广东省东莞市长安镇厦岗南面工业区，是一家专业生产箱包、手袋、制鞋、制衣等行业的各种压铸锌合金饰品配件；以及专业生产工业用华司（垫圈）与组合螺丝用华司（垫圈）、弹垫、挡圈、卡环、E扣、精密电子配件、螺母等各种类型冲压五金配件,另外，我们有四个分厂，涉及模具制造，塑胶零件注塑成型，螺母螺丝加工，数控车床加工件，自动车床加工件,精密进口先进的五轴，四轴，三轴电脑锣加工件。 公司引进台湾先进的专业机器及周边设备，借鉴台湾、香港和大陆数十年之模具制造经验，凭着坚实的研发能力，为客户提供品质优良且价格合理之产品。与客户紧密配合，以满足客户生产需求为己任。",
+									"area": [
+											"China",
+											"Japan",
+											"Korea"
+									],
+									"establishedYear": "1996",
+									"creditCode": "123456789123456789",
+									"internetSide": " http://www.l-tooling.com",
+									"shareholders": [
+											{
+													"name": "张三",
+													"share": 50
+											},
+											{
+													"name": "李四 ",
+													"share": 25
+											},
+											{
+													"name": "王五",
+													"share": 25
+											}
+									],
+									"keyWordClssifacation": [
+											"engineering",
+											"semiconductor",
+											"electronics"
+									],
+									"keyWords": [
+											"工程机械",
+											"汽车",
+											"电子行业",
+											"涂装",
+											"渡银",
+											"测试4"
+									],
+									"employeeNumber": " 500-1000",
+									"RDDesignEmployee": {
+											"employeeNumber": "300",
+											"share": 10
+									},
+									"techEmployee": {
+											"employeeNumber": "300",
+											"share": 10
+									},
+									"QIEmployee": {
+											"employeeNumber": "100",
+											"share": 10
+									},
+									"annualOutputValue": "5000000",
+									"maxAnnualOutputValue": "5000000",
+									"importExport": {
+											"rights": "Y",
+											"share": 10
+									},
+									"keyFeatures": [
+											"smithing",
+											"plating",
+											"bearing"
+									],
+									"factoryArea": "50000",
+									"certifications": [
+											"ISO9001"
+									]
+							}
+   *         },
+   *         "message":"success"
+   *     }
+   * @apiError QueryError
+   * @apiErrorExample {json} 服务器错误:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        code: 500,
+   *        message: '修改错误',
+   *     }				
+		*/
 		async function companyUpdate(req, res, seneca) {
 			let company;
 			const id = req.body.id;
