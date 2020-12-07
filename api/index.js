@@ -2,6 +2,7 @@ const { config } = require("./config/dev");
 const BodyParser = require("body-parser");
 const Mservice = require("./plugin/mSevice");
 const Sourcing = require("./plugin/sourcing");
+const Poetry = require("./plugin/poetry");
 const Express = require("express");
 const app = Express();
 
@@ -32,8 +33,9 @@ app.use(BodyParser.json());
 try {
   (async () => {
     await app.listen(config.webUrl)
-    const seneca = await Mservice.initMservice(config.defaultService, config.sourcingServiceUrl);
+    const seneca = await Mservice.initMservice(config.defaultService, config.sourcingServiceUrl, config.poetryServiceUrl);
     Sourcing.initMroute(app, seneca);
+    Poetry.initMroute(app, seneca);
   })();
 }
 catch (err) {
